@@ -13,14 +13,54 @@ class Tasks extends CSV_Model {
             $this->rest->option(CURLOPT_PORT, REST_PORT);
             $json = $this->rest->get('/job');
 
-            //$result = json_decode($json,);
             foreach ($json as $key => $record) {
                 $this->_data[$key] = $record;
             }
             
             $this->reindex();
+        }
 
+        // Override CSV Model Store
+        public function store()
+        {
 
+        }
+
+        // Retrieve an existing DB record as an object
+        function get($key, $key2 = null)
+        {
+                $this->rest->initialize(array('server' => REST_SERVER));
+                $this->rest->option(CURLOPT_PORT, REST_PORT);
+                return $this->rest->get('/job/' . $key);
+        }
+
+        // Delete a record from the DB
+        function delete($key, $key2 = null)
+        {
+                $this->rest->initialize(array('server' => REST_SERVER));
+                $this->rest->option(CURLOPT_PORT, REST_PORT);
+                $this->rest->delete('/job/' . $key);
+                $this->load(); // because the "database" might have changed
+        }
+
+        // Update a record in the DB
+        function update($record)
+        {
+                $this->rest->initialize(array('server' => REST_SERVER));
+                $this->rest->option(CURLOPT_PORT, REST_PORT);
+                $key = $record->{$this->_keyfield};
+                $retrieved = $this->rest->put('/job/' . $key, $record);
+                $this->load(); // because the "database" might have changed
+        }
+
+        // Add a record to the DB
+        function add($record)
+        {
+                $this->rest->initialize(array('server' => REST_SERVER));
+                $this->rest->option(CURLOPT_PORT, REST_PORT);
+                $key = $record->{$this->_keyfield};
+                $retrieved = $this->rest->post('/job/' . $key, $record);
+                $this->load(); // because the "database" might have changed
         }
 
         function getCategorizedTasks()
