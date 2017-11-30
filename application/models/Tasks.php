@@ -7,6 +7,20 @@ class Tasks extends CSV_Model {
                 parent::__construct(APPPATH . '../data/tasks.csv', 'id');
         }
 
+        public function load()
+        {
+            $this->rest->initialize(array('server' => REST_SERVER));
+            $this->rest->option(CURLOPT_PORT, REST_PORT);
+            $result = json_decode($this->rest->get('job.json'), true);
+            foreach ($result as $key => $record) {
+                $this->_data[$key] = $record;
+            }
+            
+            $this->reindex();
+
+
+        }
+
         function getCategorizedTasks()
         {
             // extract the undone tasks
